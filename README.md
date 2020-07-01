@@ -18,6 +18,6 @@ Use the following instructions to deploy the sample application.
 - [The AWS CLI]
 
 # Setup for running
-![InitialJournal](/InitialJournal.docx)
+![InitialJournal](https://drive.google.com/file/d/1SRurBRzmlY4Nla21TaRkbcUYOZwe3dbb/view?usp=sharing)
 For programing/executing code,
 Please refer to above link for environment setup and some AWS CLI usage.
