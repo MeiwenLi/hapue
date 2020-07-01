@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- **DO THIS**: -->
+    <!--   Replace SDK_VERSION_NUMBER with the current SDK version number -->
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.696.0.min.js"></script>
+    <script src="./transite.js" charset=“utf-8”></script>
+</head>
+<body>
+    <h1>HAPPY TRANSLATE/帮您翻译</h1>
+    <h2>Upload your image, we will help to translate the English to Chinese</h2>
+    <h2>上传文件，我们帮您将图片中的英文翻译成中文</h2>
+    <div id="app"></div>
+    <div id="text" charset=“utf-8”></div>
+    <script>
+        function getHtml(template) {
+            return template.join('\n');
+        }
+        uploadImage();
+    </script>
+    <p class="notes  hidden-xs">This site is still under construction. Please contact meiwenl@andrew.cmu.edu if you would like to make a contribution</p>
+</body>
+</html>
