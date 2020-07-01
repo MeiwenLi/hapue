@@ -1,6 +1,8 @@
 # HappyTranslator for Kids & Seniors(Java)
 
 ![HappyTranslator WebSite](https://transite2.s3-us-west-2.amazonaws.com/transite.html)
+
+#Architecture
 ![Architecture](/Hapue.png)
 
 The project source includes function code and supporting resources:
@@ -16,5 +18,6 @@ Use the following instructions to deploy the sample application.
 - [The AWS CLI]
 
 # Setup for running
-For setting up your environment for programing/executing code,
-Please refer to /InitialJournal.docx for environment setup and some AWS CLI usage.
+![InitialJournal](/InitialJournal.docx)
+For programing/executing code,
+Please refer to above link for environment setup and some AWS CLI usage.
