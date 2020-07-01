@@ -2,7 +2,7 @@
 
 ![HappyTranslator WebSite](https://transite2.s3-us-west-2.amazonaws.com/transite.html)
 
-#Architecture
+# Architecture
 ![Architecture](/Hapue.png)
 
 The project source includes function code and supporting resources:
