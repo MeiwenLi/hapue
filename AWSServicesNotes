@@ -1,0 +1,16 @@
+This application is based on AWS Services. To better involved into this problem, I would recommend you to get some general idea about AWS Services.
+
+Service/API used in this project
+1.	AWS Lambda
+2.	Amazon S3
+3.	AWS IAM
+4.	Amazon Cognito
+5.	Amazon CloudWatch
+6.	Amazon Rekognition
+7.	Amazon Translate
+
+Lambda is the core of this application. And here are some references you can take a look at about Lambda
+https://www.youtube.com/watch?v=xmacMfbrG28&t=746s
+https://www.youtube.com/watch?v=QdzV04T_kec&t=2649s
+https://www.youtube.com/watch?v=TOn0xhev0Uk
+
