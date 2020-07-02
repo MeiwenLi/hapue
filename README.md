@@ -21,3 +21,6 @@ Use the following instructions to deploy the sample application.
 For programing/executing code,
 Please refer to below link for environment setup and some AWS CLI usage.
 https://drive.google.com/file/d/1SRurBRzmlY4Nla21TaRkbcUYOZwe3dbb/view?usp=sharing
+
+# Product features, Stories and Tasks
+https://docs.google.com/document/d/1dtcmU4wWNfunx5YN82EP7FXSr69_NsX0VbRCmFDWS4I/edit?usp=sharing
