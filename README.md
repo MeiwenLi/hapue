@@ -1,6 +1,7 @@
 # HappyTranslator for Kids & Seniors(Java)
 
-![HappyTranslator WebSite](https://transite2.s3-us-west-2.amazonaws.com/transite.html)
+# HappyTranslator WebSite
+https://transite2.s3-us-west-2.amazonaws.com/transite.html
 
 # Architecture
 ![Architecture](/Hapue.png)
