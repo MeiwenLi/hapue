@@ -28,6 +28,7 @@ Please do not change existing dependencies version in POM.xml but only add new o
 6. Commit and push your code to your own branch with descriptions better including purpose, risk of your set of code.
             git commit -m "test the repository branches setting”
             git push <--set-upstream origin reporter>
+7. You can choose to delete your branch or keep it for next use. If you keep it, please make sure you pull latest code before use next time!
 
 To remove the last commit from git, you can simply run git reset --hard HEAD^ If you are removing multiple commits from the top, you can run git reset --hard HEAD~2 to remove the last two commits.
 
