@@ -8,6 +8,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,8 +52,21 @@ import com.amazonaws.services.translate.AmazonTranslateClient;
 import com.amazonaws.services.translate.model.TranslateTextRequest;
 import com.amazonaws.services.translate.model.TranslateTextResult;
 
+//dynamodb
+import java.util.Arrays;
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.document.DynamoDB;
+import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.PutItemOutcome;
+import com.amazonaws.services.dynamodbv2.document.Table;
+
+
 // Handler value: example.Handler
 public class Handler implements RequestHandler<S3Event, String> {
+  List <TextDetection> englishResult = new ArrayList<>();
+  StringBuilder chineseBuilder = new StringBuilder();
   Gson gson = new GsonBuilder().setPrettyPrinting().create();
   private static final Logger logger = LoggerFactory.getLogger(Handler.class);
   private static final float MAX_WIDTH = 100;
@@ -145,11 +159,21 @@ public class Handler implements RequestHandler<S3Event, String> {
               TranslateTextResult result_N  = translate.translateText(request_N);
               builder.append(result_N.getTranslatedText());
               builder.append("\n");
+              chineseBuilder = builder;
             }
 
         }
       } catch(AmazonRekognitionException e) {
         e.printStackTrace();
+      }
+
+      StringBuilder engSB = new StringBuilder();
+      for (TextDetection ele : englishResult)
+      {
+        if (ele.getType().equals("LINE")) {
+          engSB.append(ele.getDetectedText());
+          engSB.append("\n");
+        }
       }
 
       //upload the extracted and translated text to S3 as a file
@@ -166,10 +190,48 @@ public class Handler implements RequestHandler<S3Event, String> {
       }
       logger.info("Successfully extracted the text from " + srcBucket + "/"
               + srcKey + " and uploaded to " + dstBucket + "/" + dstKey);
+
+
+      //Dynamodb
+      AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard()
+              .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("http://dynamodb.us-east-2.amazonaws.com", "us-east-2"))
+              .build();
+
+      DynamoDB dynamoDB = new DynamoDB(client);
+
+      Table table = dynamoDB.getTable("CustomersRecord");
+
+      String UserID = srcKey;
+      String untranslatedWord = engSB.toString();
+      String translatedWord = chineseBuilder.toString();
+      // String untranslatedWord = "Apple";
+
+      /*
+      final Map<String, Object> infoMap = new HashMap<String, Object>();
+      infoMap.put("plot", "Nothing happens at all.");
+      infoMap.put("rating", 0);
+       */
+
+      try {
+        System.out.println("Adding a new item...");
+        PutItemOutcome outcome = table
+                .putItem(new Item().withPrimaryKey("UserID", UserID, "translatedWord", translatedWord)
+                        .withString("untranslatedWord", untranslatedWord));
+        //.withMap("info", infoMap));
+
+        System.out.println("PutItem succeeded:\n" + outcome.getPutItemResult());
+
+      } catch (Exception e) {
+        System.err.println("Unable to add item: " + UserID + " " + translatedWord);
+        System.err.println(e.getMessage());
+      }
+
       return "Ok";
+
 
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
+
 }
