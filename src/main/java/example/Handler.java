@@ -1,17 +1,10 @@
 package example;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.imageio.ImageIO;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentialsProvider;
@@ -21,9 +14,7 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.S3Event;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.event.S3EventNotification.S3EventNotificationRecord;
-import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-//import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 
 import com.amazonaws.services.rekognition.AmazonRekognition;
@@ -44,8 +35,6 @@ import org.slf4j.LoggerFactory;
 
 //for translation
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.translate.AmazonTranslate;
 import com.amazonaws.services.translate.AmazonTranslateClient;
 import com.amazonaws.services.translate.model.TranslateTextRequest;
@@ -70,7 +59,7 @@ public class Handler implements RequestHandler<S3Event, String> {
       String srcBucket = record.getS3().getBucket().getName();
       String srcKey = record.getS3().getObject().getUrlDecodedKey();
 
-      String dstBucket = srcBucket + "-trans";
+      String dstBucket = srcBucket+ "-trans";
       String dstKey = srcKey + ".txt";
 
       // Infer the image type.

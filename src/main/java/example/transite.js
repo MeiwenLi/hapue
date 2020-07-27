@@ -27,10 +27,16 @@
 
 // snippet-start:[s3.JavaScript.photoAlbumExample.complete]
 // snippet-start:[s3.JavaScript.photoAlbumExample.config]
-var albumBucketName = "mwlibucket2";
-var dstBucketName = "mwlibucket2-trans"
-var bucketRegion = "us-west-2";
-var IdentityPoolId = "us-west-2:15bc05f2-4595-4c85-9509-226f69f8d539"; //transitepool
+//var albumBucketName = "sourceimageupload";
+//var dstBucketName = "sourceimageupload-trans"
+//var bucketRegion = "us-east-1";
+//var IdentityPoolId = "us-east-1:c0655d85-4e3b-40b8-a246-b078ef130d39"; //transitepool
+
+var albumBucketName = "happytranslateaudioinput";
+var dstBucketName = "happytranslateaudioinput-trans"
+var bucketRegion = "us-east-1";
+var IdentityPoolId = "us-east-1:c0655d85-4e3b-40b8-a246-b078ef130d39"; //transitepool
+
 
 AWS.config.update({
     region: bucketRegion,
@@ -62,7 +68,7 @@ function uploadImage() {
     document.getElementById("text").innerHTML = "";
 }
 
-function addPhoto() {
+function addPhoto(albumName) {
     var files = document.getElementById("photoupload").files;
     if (!files.length) {
         return alert("Please choose a file to upload first.");

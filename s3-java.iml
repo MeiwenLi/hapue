@@ -33,6 +33,7 @@
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.6.7" level="project" />
     <orderEntry type="library" name="Maven: com.amazonaws:jmespath-java:1.11.268" level="project" />
     <orderEntry type="library" name="Maven: com.amazonaws:aws-java-sdk-rekognition:1.11.268" level="project" />
+    <orderEntry type="library" name="Maven: com.amazonaws:aws-java-sdk-polly:1.11.268" level="project" />
     <orderEntry type="library" name="Maven: com.amazonaws:aws-xray-recorder-sdk-core:2.4.0" level="project" />
     <orderEntry type="library" name="Maven: com.amazonaws:aws-java-sdk-xray:1.11.398" level="project" />
     <orderEntry type="library" name="Maven: com.amazonaws:aws-xray-recorder-sdk-aws-sdk-core:2.4.0" level="project" />
@@ -45,5 +46,6 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-engine:5.6.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.platform:junit-platform-engine:1.6.0" level="project" />
     <orderEntry type="library" name="Maven: com.amazonaws:aws-java-sdk-translate:1.11.268" level="project" />
+    <orderEntry type="library" name="Maven: com.amazonaws:aws-java-sdk-comprehend:1.11.268" level="project" />
   </component>
 </module>
