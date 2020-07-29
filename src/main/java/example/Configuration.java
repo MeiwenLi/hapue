@@ -2,8 +2,8 @@ package example;
 
 public class Configuration {
     //bucket setting for uploading image to be translated, recognized, putting result and save adio
-    public static final String tans_bucket = "transbucket";
-    public static final String rek_bucket = "rekbucket";
+    public static final String tans_bucket = "hapuetransbucket";
+    public static final String rek_bucket = "hapuerekbucket";
     public static final String text_resultBucket = "textresultbucket";
     public static final String audio_resultBucket = "audioresultbucket";
 
