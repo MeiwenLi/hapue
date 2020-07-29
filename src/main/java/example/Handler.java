@@ -70,7 +70,8 @@ public class Handler implements RequestHandler<S3Event, String> {
       String srcBucket = record.getS3().getBucket().getName();
       String srcKey = record.getS3().getObject().getUrlDecodedKey();
 
-      String dstBucket = srcBucket + "-trans";
+      //String dstBucket = srcBucket + "-trans";
+      String dstBucket = Configuration.text_resultBucket;
       String dstKey = srcKey + ".txt";
 
       // Infer the image type.
@@ -115,7 +116,8 @@ public class Handler implements RequestHandler<S3Event, String> {
 
         //*********************Test  translation logic
 
-        String REGION = "region";
+        //String REGION = "region";
+        String REGION = "us-east-2";
         AWSCredentialsProvider awsCreds = DefaultAWSCredentialsProviderChain.getInstance();
 
         AmazonTranslate translate = AmazonTranslateClient.builder()
