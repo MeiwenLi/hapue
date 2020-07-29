@@ -42,7 +42,8 @@ public class AudioHandler implements RequestHandler<S3Event, String>{
 
         String srcBucket = record.getS3().getBucket().getName();
         String srcKey = record.getS3().getObject().getUrlDecodedKey();
-        String dstBucket = srcBucket + "-trans";
+//        String dstBucket = srcBucket + "-trans";
+        String dstBucket = Configuration.audio_resultBucket;
         String dstKey = srcKey + ".mp3";
         // create client for each aws S3, Polly, and Comprehend
         AmazonS3 s3Client = AmazonS3ClientBuilder.defaultClient();
