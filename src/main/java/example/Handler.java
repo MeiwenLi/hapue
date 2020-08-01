@@ -191,20 +191,39 @@ public class Handler implements RequestHandler<S3Event, String> {
       logger.info("Successfully extracted the text from " + srcBucket + "/"
               + srcKey + " and uploaded to " + dstBucket + "/" + dstKey);
 
+      saveData(srcKey, engSB, chineseBuilder);
+      return "Ok";
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
-      //Dynamodb
-      AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard()
-              .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("http://dynamodb.us-east-2.amazonaws.com", "us-east-2"))
-              .build();
+  private static void saveData(String userID, StringBuilder engSB, StringBuilder chineseBuilder){
 
-      DynamoDB dynamoDB = new DynamoDB(client);
+    //List <TextDetection> englishResult = new ArrayList<>();
+    //StringBuilder chineseBuilder = new StringBuilder();
 
-      Table table = dynamoDB.getTable("CustomersRecord");
+//    StringBuilder engSB = new StringBuilder();
+//    for (TextDetection ele : englishResult)
+//    {
+//      if (ele.getType().equals("LINE")) {
+//        engSB.append(ele.getDetectedText());
+//        engSB.append("\n");
+//      }
+//    }
 
-      String UserID = srcKey;
-      String untranslatedWord = engSB.toString();
-      String translatedWord = chineseBuilder.toString();
-      // String untranslatedWord = "Apple";
+    //Dynamodb
+    AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard()
+            .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("http://dynamodb.us-east-2.amazonaws.com", "us-east-2"))
+            .build();
+
+    DynamoDB dynamoDB = new DynamoDB(client);
+
+    Table table = dynamoDB.getTable("CustomersRecord");
+
+    String UserID = userID;
+    String untranslatedWord = engSB.toString();
+    String translatedWord = chineseBuilder.toString();
 
       /*
       final Map<String, Object> infoMap = new HashMap<String, Object>();
@@ -212,25 +231,18 @@ public class Handler implements RequestHandler<S3Event, String> {
       infoMap.put("rating", 0);
        */
 
-      try {
-        System.out.println("Adding a new item...");
-        PutItemOutcome outcome = table
-                .putItem(new Item().withPrimaryKey("UserID", UserID, "translatedWord", translatedWord)
-                        .withString("untranslatedWord", untranslatedWord));
-        //.withMap("info", infoMap));
+    try {
+      System.out.println("Adding a new item...");
+      PutItemOutcome outcome = table
+              .putItem(new Item().withPrimaryKey("UserID", UserID, "translatedWord", translatedWord)
+                      .withString("untranslatedWord", untranslatedWord));
+      //.withMap("info", infoMap));
 
-        System.out.println("PutItem succeeded:\n" + outcome.getPutItemResult());
+      System.out.println("PutItem succeeded:\n" + outcome.getPutItemResult());
 
-      } catch (Exception e) {
-        System.err.println("Unable to add item: " + UserID + " " + translatedWord);
-        System.err.println(e.getMessage());
-      }
-
-      return "Ok";
-
-
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    } catch (Exception e) {
+      System.err.println("Unable to add item: " + UserID + " " + translatedWord);
+      System.err.println(e.getMessage());
     }
   }
 
