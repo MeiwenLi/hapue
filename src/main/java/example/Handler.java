@@ -65,8 +65,6 @@ import com.amazonaws.services.dynamodbv2.document.Table;
 
 // Handler value: example.Handler
 public class Handler implements RequestHandler<S3Event, String> {
-  List <TextDetection> englishResult = new ArrayList<>();
-  StringBuilder chineseBuilder = new StringBuilder();
   Gson gson = new GsonBuilder().setPrettyPrinting().create();
   private static final Logger logger = LoggerFactory.getLogger(Handler.class);
   private static final float MAX_WIDTH = 100;
@@ -77,10 +75,13 @@ public class Handler implements RequestHandler<S3Event, String> {
   private final String PNG_MIME = (String) "image/png";
   @Override
   public String handleRequest(S3Event s3event, Context context) {
+    List <TextDetection> englishResult = new ArrayList<>();
+    StringBuilder chineseBuilder = new StringBuilder();
+    //StringBuilder englishBuilder;
     try {
       logger.info("EVENT: " + gson.toJson(s3event));
       S3EventNotificationRecord record = s3event.getRecords().get(0);
-      
+
       String srcBucket = record.getS3().getBucket().getName();
       String srcKey = record.getS3().getObject().getUrlDecodedKey();
 
@@ -90,13 +91,13 @@ public class Handler implements RequestHandler<S3Event, String> {
       // Infer the image type.
       Matcher matcher = Pattern.compile(".*\\.([^\\.]*)").matcher(srcKey);
       if (!matcher.matches()) {
-          logger.info("Unable to infer image type for key " + srcKey);
-          return "";
+        logger.info("Unable to infer image type for key " + srcKey);
+        return "";
       }
       String imageType = matcher.group(1);
       if (!(JPG_TYPE.equals(imageType)) && !(PNG_TYPE.equals(imageType))) {
-          logger.info("Skipping non-image " + srcKey);
-          return "";
+        logger.info("Skipping non-image " + srcKey);
+        return "";
       }
 
       AmazonS3 s3Client = AmazonS3ClientBuilder.defaultClient();
@@ -120,6 +121,7 @@ public class Handler implements RequestHandler<S3Event, String> {
         else builder_old.append("DetectTextResult is null\n");
 
         List<TextDetection> textDetections = result.getTextDetections();
+        englishResult = textDetections;
 
         if (textDetections!=null) builder_old.append("textDetections is not null\n");
         else builder_old.append("textDetections is null\n");
@@ -129,18 +131,18 @@ public class Handler implements RequestHandler<S3Event, String> {
 
         //*********************Test  translation logic
 
-        String REGION = "region";
+        String REGION = "us-west-1";
         AWSCredentialsProvider awsCreds = DefaultAWSCredentialsProviderChain.getInstance();
 
         AmazonTranslate translate = AmazonTranslateClient.builder()
-                  .withCredentials(new AWSStaticCredentialsProvider(awsCreds.getCredentials()))
-                  .withRegion(REGION)
-                  .build();
+                .withCredentials(new AWSStaticCredentialsProvider(awsCreds.getCredentials()))
+                .withRegion(REGION)
+                .build();
 
         TranslateTextRequest request_T = new TranslateTextRequest()
-                  .withText("Hello, world")
-                  .withSourceLanguageCode("en")
-                  .withTargetLanguageCode("zh");
+                .withText("Hello, world")
+                .withSourceLanguageCode("en")
+                .withTargetLanguageCode("zh");
         TranslateTextResult result_T  = translate.translateText(request_T);
 
         builder_old.append(result_T.getTranslatedText());
@@ -151,16 +153,16 @@ public class Handler implements RequestHandler<S3Event, String> {
         //*************************end of translation test
 
         for (TextDetection text: textDetections) {
-            if (text.getType().equals("LINE")) {
-              TranslateTextRequest request_N = new TranslateTextRequest()
-                      .withText(text.getDetectedText())
-                      .withSourceLanguageCode("en")
-                      .withTargetLanguageCode("zh");
-              TranslateTextResult result_N  = translate.translateText(request_N);
-              builder.append(result_N.getTranslatedText());
-              builder.append("\n");
-              chineseBuilder = builder;
-            }
+          if (text.getType().equals("LINE")) {
+            TranslateTextRequest request_N = new TranslateTextRequest()
+                    .withText(text.getDetectedText())
+                    .withSourceLanguageCode("en")
+                    .withTargetLanguageCode("zh");
+            TranslateTextResult result_N  = translate.translateText(request_N);
+            builder.append(result_N.getTranslatedText());
+            builder.append("\n");
+            chineseBuilder = builder;
+          }
 
         }
       } catch(AmazonRekognitionException e) {
@@ -175,6 +177,9 @@ public class Handler implements RequestHandler<S3Event, String> {
           engSB.append("\n");
         }
       }
+      //englishBuilder = engSB;
+
+      saveData(srcKey, engSB, chineseBuilder);
 
       //upload the extracted and translated text to S3 as a file
       InputStream im = new ByteArrayInputStream(builder.toString().getBytes("UTF-8") );
@@ -190,31 +195,17 @@ public class Handler implements RequestHandler<S3Event, String> {
       }
       logger.info("Successfully extracted the text from " + srcBucket + "/"
               + srcKey + " and uploaded to " + dstBucket + "/" + dstKey);
-
-      saveData(srcKey, engSB, chineseBuilder);
       return "Ok";
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
-  private static void saveData(String userID, StringBuilder engSB, StringBuilder chineseBuilder){
-
-    //List <TextDetection> englishResult = new ArrayList<>();
-    //StringBuilder chineseBuilder = new StringBuilder();
-
-//    StringBuilder engSB = new StringBuilder();
-//    for (TextDetection ele : englishResult)
-//    {
-//      if (ele.getType().equals("LINE")) {
-//        engSB.append(ele.getDetectedText());
-//        engSB.append("\n");
-//      }
-//    }
+  public void saveData(String userID, StringBuilder engSB, StringBuilder chineseBuilder){
 
     //Dynamodb
     AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard()
-            .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("http://dynamodb.us-east-2.amazonaws.com", "us-east-2"))
+            .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("http://dynamodb.us-west-1.amazonaws.com", "us-west-1"))
             .build();
 
     DynamoDB dynamoDB = new DynamoDB(client);
@@ -245,5 +236,7 @@ public class Handler implements RequestHandler<S3Event, String> {
       System.err.println(e.getMessage());
     }
   }
+
+
 
 }
