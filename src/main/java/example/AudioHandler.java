@@ -39,10 +39,10 @@ public class AudioHandler implements RequestHandler<S3Event, String>{
     public String handleRequest(S3Event s3Event, Context context){
         logger.info("EVENT: " + gson.toJson(s3Event));
         S3EventNotificationRecord record = s3Event.getRecords().get(0);
-
+        System.out.println("Before S3!!!!!!!!!!!!!!!");
         String srcBucket = record.getS3().getBucket().getName();
         String srcKey = record.getS3().getObject().getUrlDecodedKey();
-        String dstBucket = srcBucket + "-trans";
+        String dstBucket = "happytranslateaudioresultbucket";
         String dstKey = srcKey + ".mp3";
         // create client for each aws S3, Polly, and Comprehend
         AmazonS3 s3Client = AmazonS3ClientBuilder.defaultClient();
@@ -54,12 +54,15 @@ public class AudioHandler implements RequestHandler<S3Event, String>{
         Voice voice = describeVoicesResult.getVoices().get(0);
         // read in text content from the src bucket
         String body = s3Client.getObjectAsString(srcBucket, srcKey);
+        System.out.println("After S3!!!!!!!!!!!!!!!");
+
         // detect dominant language from the text content
         DetectDominantLanguageRequest detectDominantLanguageRequest = new DetectDominantLanguageRequest().withText(body);
         DetectDominantLanguageResult detectDominantLanguageResult = comprehendClient.detectDominantLanguage(detectDominantLanguageRequest);
         DominantLanguage dominantLanguage = detectDominantLanguageResult.getLanguages().get(0);
         String languageCode = dominantLanguage.getLanguageCode();
         String voiceId = voice.getId();
+        System.out.println("After COmprehend!!!!!!!!!!!");
         if (languageCode.equalsIgnoreCase("zh")){
             voiceId = CHINESE_VOICE_ID;
         }
@@ -71,6 +74,7 @@ public class AudioHandler implements RequestHandler<S3Event, String>{
         SynthesizeSpeechResult synthesizeSpeechResult = pollyClient.synthesizeSpeech(synthesizeSpeechRequest);
         InputStream speechStream = synthesizeSpeechResult.getAudioStream();
         ObjectMetadata om = new ObjectMetadata();
+        System.out.println("After Polly!!!!!!!!!!!!!!!!!!!!!!");
         // put audio output file into destination bucket
         try {
             s3Client.putObject(dstBucket, dstKey, speechStream, om);

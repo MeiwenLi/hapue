@@ -27,9 +27,9 @@
 
 // snippet-start:[s3.JavaScript.photoAlbumExample.complete]
 // snippet-start:[s3.JavaScript.photoAlbumExample.config]
-var albumBucketName = "mwlibucket2";
-var dstBucketName = "mwlibucket2-trans"
-var bucketRegion = "us-west-2";
+var albumBucketName = "happytranslateimage-trans";
+var dstBucketName = "happytranslateaudioresultbucket"
+var bucketRegion = "us-west-1";
 var IdentityPoolId = "us-west-2:15bc05f2-4595-4c85-9509-226f69f8d539"; //transitepool
 
 AWS.config.update({
