@@ -56,7 +56,7 @@ public class AudioHandler implements RequestHandler<S3Event, String>{
         String body = s3Client.getObjectAsString(srcBucket, srcKey);
         System.out.println("After S3!!!!!!!!!!!!!!!");
 
-        // detect dominant language from the text content
+        // detect dominant  languagefrom the text content
         DetectDominantLanguageRequest detectDominantLanguageRequest = new DetectDominantLanguageRequest().withText(body);
         DetectDominantLanguageResult detectDominantLanguageResult = comprehendClient.detectDominantLanguage(detectDominantLanguageRequest);
         DominantLanguage dominantLanguage = detectDominantLanguageResult.getLanguages().get(0);
