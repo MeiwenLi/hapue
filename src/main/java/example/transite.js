@@ -27,11 +27,14 @@
 
 // snippet-start:[s3.JavaScript.photoAlbumExample.complete]
 // snippet-start:[s3.JavaScript.photoAlbumExample.config]
-var albumBucketName = "mwlibucket2";
-var dstBucketName = "mwlibucket2-trans"
-var bucketRegion = "us-west-2";
-var IdentityPoolId = "us-west-2:15bc05f2-4595-4c85-9509-226f69f8d539"; //transitepool
-
+// var albumBucketName = "mwlibucket2";
+// var dstBucketName = "mwlibucket2-trans"
+// var bucketRegion = "us-west-2";
+// var IdentityPoolId = "us-west-2:15bc05f2-4595-4c85-9509-226f69f8d539"; //transitepool
+var albumBucketName = "hapuetransbucket";
+var dstBucketName = "textresultbucket";
+var bucketRegion = "us-east-2";
+var IdentityPoolId = "us-east-2:1e70dbec-31db-4ee8-b023-ad74d4c8567a";
 AWS.config.update({
     region: bucketRegion,
     credentials: new AWS.CognitoIdentityCredentials({
@@ -128,9 +131,9 @@ function viewphoto(photoKey) {
     });
 }
 // snippet-start:[s3.JavaScript.photoAlbumExample.translate]
-function trans(photeKey) {
+function trans(photoKey) {
 
-    var dstKey = photeKey + ".txt";
+    var dstKey = photoKey + ".txt";
     //var dstKey = "outputfile.txt";
     var params = {
         Bucket: dstBucketName,
