@@ -57,6 +57,9 @@ public class ObjectHandler implements RequestHandler<S3Event, String> {
             //get the dstBucket name and result name
             String dstBucket = Configuration.text_resultBucket;
             String dstKey = srcKey + ".txt";
+            
+            StringBuilder engSB = new StringBuilder();
+            StringBuilder chineseBuilder = new StringBuilder();
 
             // Infer the image type.
             Matcher matcher = Pattern.compile(".*\\.([^\\.]*)").matcher(srcKey);
@@ -85,7 +88,8 @@ public class ObjectHandler implements RequestHandler<S3Event, String> {
                 DetectLabelsResult result = rekognitionClient.detectLabels(request);
                 List<Label> labels = result.getLabels();
 
-                String REGION = "us-east-2";
+                //String REGION = "us-east-2";
+                String REGION = Configuration.regionTransBucket;
                 AWSCredentialsProvider awsCreds = DefaultAWSCredentialsProviderChain.getInstance();
 
                 AmazonTranslate translate = AmazonTranslateClient.builder()
@@ -114,6 +118,8 @@ public class ObjectHandler implements RequestHandler<S3Event, String> {
                             TranslateTextResult result_N = translate.translateText(request_N);
                             builder.append(result_N.getTranslatedText());
                             builder.append("\n");
+                            engSB.append(label.getName());
+                            engSB.append("\n");
                         }
                     }
                 }
@@ -127,11 +133,13 @@ public class ObjectHandler implements RequestHandler<S3Event, String> {
                     TranslateTextResult result_N = translate.translateText(request_N);
                     builder.append(result_N.getTranslatedText());
                     builder.append("\n");
+                    engSB.append(label.getName());
+                    engSB.append("\n");
                 }
             } catch (AmazonRekognitionException e) {
                 e.printStackTrace();
             }
-
+            chineseBuilder = builder;
             //upload the extracted and translated text to S3 as a file
             InputStream im = new ByteArrayInputStream(builder.toString().getBytes("UTF-8"));
             ObjectMetadata om = new ObjectMetadata();
@@ -142,6 +150,11 @@ public class ObjectHandler implements RequestHandler<S3Event, String> {
                 logger.error(e.getErrorMessage());
                 System.exit(1);
             }
+
+            //save to DynamoDB
+            //public void saveData(String userID, StringBuilder engSB, StringBuilder chineseBuilder);
+            Handler.saveData(srcKey, engSB, chineseBuilder);
+
             logger.info("Successfully extracted the text from " + srcBucket + "/"
                     + srcKey + " and uploaded to " + dstBucket + "/" + dstKey);
             return "Ok";
