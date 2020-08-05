@@ -1,18 +1,11 @@
 package example;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.imageio.ImageIO;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentialsProvider;
@@ -22,7 +15,6 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.S3Event;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.event.S3EventNotification.S3EventNotificationRecord;
-import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 //import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
@@ -45,22 +37,13 @@ import org.slf4j.LoggerFactory;
 
 //for translation
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.translate.AmazonTranslate;
 import com.amazonaws.services.translate.AmazonTranslateClient;
 import com.amazonaws.services.translate.model.TranslateTextRequest;
 import com.amazonaws.services.translate.model.TranslateTextResult;
 
-//dynamodb
-import java.util.Arrays;
-import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
-import com.amazonaws.services.dynamodbv2.document.DynamoDB;
-import com.amazonaws.services.dynamodbv2.document.Item;
-import com.amazonaws.services.dynamodbv2.document.PutItemOutcome;
-import com.amazonaws.services.dynamodbv2.document.Table;
+
+import example.SaveDataController;
 
 
 // Handler value: example.Handler
@@ -73,11 +56,17 @@ public class Handler implements RequestHandler<S3Event, String> {
   private final String JPG_MIME = (String) "image/jpeg";
   private final String PNG_TYPE = (String) "png";
   private final String PNG_MIME = (String) "image/png";
+  private final SaveDataController saveDataController;
+
+  // create object
+  public Handler() {
+    saveDataController = new SaveDataController();
+  }
+
   @Override
   public String handleRequest(S3Event s3event, Context context) {
     List <TextDetection> englishResult = new ArrayList<>();
     StringBuilder chineseBuilder = new StringBuilder();
-    //StringBuilder englishBuilder;
     try {
       logger.info("EVENT: " + gson.toJson(s3event));
       S3EventNotificationRecord record = s3event.getRecords().get(0);
@@ -131,7 +120,7 @@ public class Handler implements RequestHandler<S3Event, String> {
 
         //*********************Test  translation logic
 
-        String REGION = "us-west-1";
+        String REGION = "us-west-2";
         AWSCredentialsProvider awsCreds = DefaultAWSCredentialsProviderChain.getInstance();
 
         AmazonTranslate translate = AmazonTranslateClient.builder()
@@ -178,8 +167,7 @@ public class Handler implements RequestHandler<S3Event, String> {
         }
       }
       //englishBuilder = engSB;
-
-      saveData(srcKey, engSB, chineseBuilder);
+      saveDataController.saveData(srcKey, engSB, chineseBuilder);
 
       //upload the extracted and translated text to S3 as a file
       InputStream im = new ByteArrayInputStream(builder.toString().getBytes("UTF-8") );
@@ -201,41 +189,6 @@ public class Handler implements RequestHandler<S3Event, String> {
     }
   }
 
-  public void saveData(String userID, StringBuilder engSB, StringBuilder chineseBuilder){
-
-    //Dynamodb
-    AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard()
-            .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("http://dynamodb.us-west-1.amazonaws.com", "us-west-1"))
-            .build();
-
-    DynamoDB dynamoDB = new DynamoDB(client);
-
-    Table table = dynamoDB.getTable("CustomersRecord");
-
-    String UserID = userID;
-    String untranslatedWord = engSB.toString();
-    String translatedWord = chineseBuilder.toString();
-
-      /*
-      final Map<String, Object> infoMap = new HashMap<String, Object>();
-      infoMap.put("plot", "Nothing happens at all.");
-      infoMap.put("rating", 0);
-       */
-
-    try {
-      System.out.println("Adding a new item...");
-      PutItemOutcome outcome = table
-              .putItem(new Item().withPrimaryKey("UserID", UserID, "translatedWord", translatedWord)
-                      .withString("untranslatedWord", untranslatedWord));
-      //.withMap("info", infoMap));
-
-      System.out.println("PutItem succeeded:\n" + outcome.getPutItemResult());
-
-    } catch (Exception e) {
-      System.err.println("Unable to add item: " + UserID + " " + translatedWord);
-      System.err.println(e.getMessage());
-    }
-  }
 
 
 
