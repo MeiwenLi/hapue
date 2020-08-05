@@ -74,7 +74,8 @@ public class Handler implements RequestHandler<S3Event, String> {
       String srcBucket = record.getS3().getBucket().getName();
       String srcKey = record.getS3().getObject().getUrlDecodedKey();
 
-      String dstBucket = srcBucket + "-trans";
+      //String dstBucket = srcBucket + "-trans";
+      String dstBucket = Configuration.text_resultBucket;
       String dstKey = srcKey + ".txt";
 
       // Infer the image type.
@@ -92,8 +93,8 @@ public class Handler implements RequestHandler<S3Event, String> {
       AmazonS3 s3Client = AmazonS3ClientBuilder.defaultClient();
 
       //Create a helloworld file for testing the basic functionality
-      StringBuilder builder_old = new StringBuilder();
-      builder_old.append("hello world");
+//      StringBuilder builder_old = new StringBuilder();
+//      builder_old.append("hello world");
 
       //Call rekognition APIs for extract text from a image
       AmazonRekognition rekognitionClient = AmazonRekognitionClientBuilder.defaultClient();
@@ -106,21 +107,25 @@ public class Handler implements RequestHandler<S3Event, String> {
       try {
         DetectTextResult result = rekognitionClient.detectText(request);
 
-        if (result!=null) builder_old.append("DetectTextResult is not null\n");
-        else builder_old.append("DetectTextResult is null\n");
-
+//        if (result!=null) builder_old.append("DetectTextResult is not null\n");
+//        else builder_old.append("DetectTextResult is null\n");
+//
         List<TextDetection> textDetections = result.getTextDetections();
         englishResult = textDetections;
-
-        if (textDetections!=null) builder_old.append("textDetections is not null\n");
-        else builder_old.append("textDetections is null\n");
-
-        if (textDetections.isEmpty()) builder_old.append("textDetections is empty\n");
-        else builder_old.append("textDetections is NOT empty\n");
+//
+//        if (textDetections!=null) builder_old.append("textDetections is not null\n");
+//        else builder_old.append("textDetections is null\n");
+//
+//        if (textDetections.isEmpty()) builder_old.append("textDetections is empty\n");
+//        else builder_old.append("textDetections is NOT empty\n");
 
         //*********************Test  translation logic
 
+<<<<<<< HEAD
         String REGION = "us-west-2";
+=======
+        String REGION = Configuration.regionTransBucket;
+>>>>>>> origin/develop
         AWSCredentialsProvider awsCreds = DefaultAWSCredentialsProviderChain.getInstance();
 
         AmazonTranslate translate = AmazonTranslateClient.builder()
@@ -128,16 +133,16 @@ public class Handler implements RequestHandler<S3Event, String> {
                 .withRegion(REGION)
                 .build();
 
-        TranslateTextRequest request_T = new TranslateTextRequest()
-                .withText("Hello, world")
-                .withSourceLanguageCode("en")
-                .withTargetLanguageCode("zh");
-        TranslateTextResult result_T  = translate.translateText(request_T);
-
-        builder_old.append(result_T.getTranslatedText());
-        InputStream im_old = new ByteArrayInputStream(builder_old.toString().getBytes("UTF-8"));
-        ObjectMetadata om_old = new ObjectMetadata();
-        s3Client.putObject(dstBucket,"helloworld.txt", im_old, om_old);
+//        TranslateTextRequest request_T = new TranslateTextRequest()
+//                .withText("Hello, world")
+//                .withSourceLanguageCode("en")
+//                .withTargetLanguageCode("zh");
+//        TranslateTextResult result_T  = translate.translateText(request_T);
+//
+//        builder_old.append(result_T.getTranslatedText());
+//        InputStream im_old = new ByteArrayInputStream(builder_old.toString().getBytes("UTF-8"));
+//        ObjectMetadata om_old = new ObjectMetadata();
+//        s3Client.putObject(dstBucket,"helloworld.txt", im_old, om_old);
 
         //*************************end of translation test
 
@@ -189,6 +194,45 @@ public class Handler implements RequestHandler<S3Event, String> {
     }
   }
 
+<<<<<<< HEAD
+=======
+  //public void saveData(String userID, StringBuilder engSB, StringBuilder chineseBuilder){
+  public static void saveData(String userID, StringBuilder engSB, StringBuilder chineseBuilder){
+
+    //Dynamodb
+    AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard()
+            .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("http://dynamodb.us-west-1.amazonaws.com", "us-west-1"))
+            .build();
+
+    DynamoDB dynamoDB = new DynamoDB(client);
+
+    Table table = dynamoDB.getTable("CustomersRecord");
+
+    String UserID = userID;
+    String untranslatedWord = engSB.toString();
+    String translatedWord = chineseBuilder.toString();
+
+      /*
+      final Map<String, Object> infoMap = new HashMap<String, Object>();
+      infoMap.put("plot", "Nothing happens at all.");
+      infoMap.put("rating", 0);
+       */
+
+    try {
+      System.out.println("Adding a new item...");
+      PutItemOutcome outcome = table
+              .putItem(new Item().withPrimaryKey("UserID", UserID, "translatedWord", translatedWord)
+                      .withString("untranslatedWord", untranslatedWord));
+      //.withMap("info", infoMap));
+
+      System.out.println("PutItem succeeded:\n" + outcome.getPutItemResult());
+
+    } catch (Exception e) {
+      System.err.println("Unable to add item: " + UserID + " " + translatedWord);
+      System.err.println(e.getMessage());
+    }
+  }
+>>>>>>> origin/develop
 
 
 
