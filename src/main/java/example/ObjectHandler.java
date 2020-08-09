@@ -41,6 +41,12 @@ public class ObjectHandler implements RequestHandler<S3Event, String> {
     private final String JPG_MIME = (String) "image/jpeg";
     private final String PNG_TYPE = (String) "png";
     private final String PNG_MIME = (String) "image/png";
+    private final SaveDataController saveDataController;
+
+    // create object
+    public ObjectHandler() {
+        saveDataController = new SaveDataController();
+    }
 
     @Override
     public String handleRequest(S3Event s3event, Context context) {
@@ -153,7 +159,7 @@ public class ObjectHandler implements RequestHandler<S3Event, String> {
 
             //save to DynamoDB
             //public void saveData(String userID, StringBuilder engSB, StringBuilder chineseBuilder);
-            Handler.saveData(srcKey, engSB, chineseBuilder);
+            saveDataController.saveData(srcKey, engSB, chineseBuilder);
 
             logger.info("Successfully extracted the text from " + srcBucket + "/"
                     + srcKey + " and uploaded to " + dstBucket + "/" + dstKey);
