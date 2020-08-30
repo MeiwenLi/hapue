@@ -168,7 +168,7 @@ public class Handler implements RequestHandler<S3Event, String> {
       // upload the extracted and translated text to S3 as a file
       InputStream im = new ByteArrayInputStream(builder.toString().getBytes("UTF-8"));
       ObjectMetadata om = new ObjectMetadata();
-      om.setContentType("text/html; charset=utf-8");
+
       try {
         s3Client.putObject(dstBucket, dstKey, im, om);
       } catch (AmazonServiceException e) {
