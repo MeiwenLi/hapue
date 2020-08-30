@@ -38,8 +38,6 @@
     <orderEntry type="library" name="Maven: com.amazonaws:aws-xray-recorder-sdk-aws-sdk-core:2.4.0" level="project" />
     <orderEntry type="library" name="Maven: com.amazonaws:aws-xray-recorder-sdk-aws-sdk:2.4.0" level="project" />
     <orderEntry type="library" name="Maven: com.amazonaws:aws-xray-recorder-sdk-aws-sdk-instrumentor:2.4.0" level="project" />
-    <orderEntry type="library" name="Maven: com.amazonaws:aws-java-sdk-polly:1.11.816" level="project" />
-    <orderEntry type="library" name="Maven: com.amazonaws:aws-java-sdk-comprehend:1.11.816" level="project" />
     <orderEntry type="library" name="Maven: com.amazonaws:aws-java-sdk-dynamodb:1.11.816" level="project" />
     <orderEntry type="library" name="Maven: com.amazonaws:aws-java-sdk-ses:1.11.119" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-api:5.6.0" level="project" />
